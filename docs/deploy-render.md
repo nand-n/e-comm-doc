@@ -2,59 +2,62 @@
 
 VitePress builds to static HTML. Use a **Static Site** on Render (not a Web Service).
 
-## Option A — Blueprint (`render.yaml` in repo root)
+## Critical: update Build Command in the dashboard
 
-1. Push this repo to GitHub / GitLab / Bitbucket.
-2. In [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint**.
-3. Connect the repo. Render reads `render.yaml` and creates the static site.
-4. Wait for the first deploy. URL: `https://e-comm-docs.onrender.com` (or your custom name).
+If the service already exists, **Blueprint alone may not change the Build Command**.
 
-## Option B — Manual static site
+1. Open the service → **Settings** → **Build & Deploy**
+2. Set **Build Command** to exactly:
 
-1. **New** → **Static Site** → connect repo.
-2. Settings:
+```bash
+npm install && npm run docs:build
+```
+
+3. Set **Publish Directory** to:
+
+```text
+docs/.vitepress/dist
+```
+
+4. Remove any `corepack enable` from the build command (that causes `EROFS: unlink '/usr/bin/pnpm'`).
+5. **Manual Deploy** → **Clear build cache & deploy**
+
+## Option A — Blueprint (`render.yaml`)
+
+1. Push this repo.
+2. **New** → **Blueprint** → connect repo (or sync existing Blueprint).
+3. Confirm build command is `npm install && npm run docs:build`.
+
+## Option B — New static site
 
 | Field | Value |
 |-------|--------|
-| **Name** | `e-comm-docs` (any name) |
-| **Branch** | `main` (or your default) |
-| **Root directory** | *(leave empty — repo root)* |
-| **Build command** | `CI=true pnpm install --frozen-lockfile && pnpm docs:build` |
+| **Build command** | `npm install && npm run docs:build` |
 | **Publish directory** | `docs/.vitepress/dist` |
+| **NODE_VERSION** | `20` |
 
-3. **Environment** → add:
+## Why not pnpm on Render?
 
-| Key | Value |
-|-----|--------|
-| `NODE_VERSION` | `20` |
+Render’s filesystem under `/usr/bin` is read-only. Anything that runs `corepack enable` (including auto-detect from a `packageManager` field) tries to rewrite `/usr/bin/pnpm` and fails with:
 
-4. **Create Static Site**.
-
-## Verify locally first
-
-```bash
-pnpm install
-pnpm docs:build
-pnpm docs:preview
+```text
+EROFS: read-only file system, unlink '/usr/bin/pnpm'
 ```
 
-Open the URL VitePress prints (usually `http://localhost:4173`).
+Locally you can still use `pnpm` if you want. **On Render, use npm.**
 
-## Custom domain (optional)
+## Verify locally
 
-Render static site → **Settings** → **Custom Domains** → add your domain and set DNS as Render instructs.
+```bash
+npm install
+npm run docs:build
+npm run docs:preview
+```
 
-## Notes
-
-- **pnpm**: Render detects `pnpm-lock.yaml` and provides pnpm. Do not run `corepack enable`; Render's `/usr/bin` is read-only.
-- **Free tier**: static sites on Render free tier spin down only applies to web services; static sites stay served from CDN.
-- **Auto deploy**: each push to the connected branch triggers a new build.
-
-## If build fails
+## If build still fails
 
 | Issue | Fix |
 |-------|-----|
-| `EROFS ... unlink '/usr/bin/pnpm'` | Remove `corepack enable`; use the build command above |
-| `pnpm: command not found` | Use `corepack pnpm install --frozen-lockfile && corepack pnpm docs:build` without running `corepack enable` |
-| `esbuild` errors | `pnpm.onlyBuiltDependencies` already includes `esbuild` in `package.json` |
-| Wrong site / 404 on routes | Publish path must be `docs/.vitepress/dist`, not `dist` |
+| `EROFS ... /usr/bin/pnpm` | Dashboard Build Command still has `corepack` or `pnpm`. Change it to `npm install && npm run docs:build`, clear cache, redeploy |
+| Old command after push | Edit **Settings → Build & Deploy** manually; Blueprint sync is not always applied |
+| Wrong publish path | Must be `docs/.vitepress/dist` |
