@@ -5,7 +5,7 @@ services:
   - type: web
     name: e-comm-docs
     runtime: static
-    buildCommand: corepack enable && pnpm install && pnpm docs:build
+    buildCommand: CI=true pnpm install --frozen-lockfile && pnpm docs:build
     staticPublishPath: docs/.vitepress/dist
     envVars:
       - key: NODE_VERSION

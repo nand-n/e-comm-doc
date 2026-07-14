@@ -19,7 +19,7 @@ VitePress builds to static HTML. Use a **Static Site** on Render (not a Web Serv
 | **Name** | `e-comm-docs` (any name) |
 | **Branch** | `main` (or your default) |
 | **Root directory** | *(leave empty — repo root)* |
-| **Build command** | `corepack enable && pnpm install && pnpm docs:build` |
+| **Build command** | `CI=true pnpm install --frozen-lockfile && pnpm docs:build` |
 | **Publish directory** | `docs/.vitepress/dist` |
 
 3. **Environment** → add:
@@ -46,7 +46,7 @@ Render static site → **Settings** → **Custom Domains** → add your domain a
 
 ## Notes
 
-- **pnpm**: `corepack enable` lets Render use the `packageManager` field in `package.json`.
+- **pnpm**: Render detects `pnpm-lock.yaml` and provides pnpm. Do not run `corepack enable`; Render's `/usr/bin` is read-only.
 - **Free tier**: static sites on Render free tier spin down only applies to web services; static sites stay served from CDN.
 - **Auto deploy**: each push to the connected branch triggers a new build.
 
@@ -54,6 +54,7 @@ Render static site → **Settings** → **Custom Domains** → add your domain a
 
 | Issue | Fix |
 |-------|-----|
-| `pnpm: command not found` | Use build command with `corepack enable &&` prefix |
+| `EROFS ... unlink '/usr/bin/pnpm'` | Remove `corepack enable`; use the build command above |
+| `pnpm: command not found` | Use `corepack pnpm install --frozen-lockfile && corepack pnpm docs:build` without running `corepack enable` |
 | `esbuild` errors | `pnpm.onlyBuiltDependencies` already includes `esbuild` in `package.json` |
 | Wrong site / 404 on routes | Publish path must be `docs/.vitepress/dist`, not `dist` |
