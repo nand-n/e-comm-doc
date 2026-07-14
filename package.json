@@ -9,7 +9,7 @@
     "build": "vitepress build docs"
   },
   "engines": {
-    "node": ">=20"
+    "node": "20.x"
   },
   "devDependencies": {
     "vitepress": "^1.6.3",

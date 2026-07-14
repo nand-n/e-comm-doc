@@ -1,14 +1,11 @@
 # Render Blueprint — static VitePress docs
 # https://render.com/docs/blueprint-spec
-#
-# Use npm on Render. Do NOT use `corepack enable` or pnpm here —
-# Render's /usr/bin is read-only and corepack fails with EROFS.
 
 services:
   - type: web
     name: e-comm-docs
     runtime: static
-    buildCommand: npm install && npm run docs:build
+    buildCommand: rm -rf node_modules && npm ci && npm run docs:build
     staticPublishPath: docs/.vitepress/dist
     envVars:
       - key: NODE_VERSION
