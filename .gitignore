@@ -1,0 +1,12 @@
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+
+# VitePress build
+docs/.vitepress/dist
+docs/.vitepress/cache
+
+# Env / OS
+.DS_Store
+*.local
