@@ -1,0 +1,12 @@
+# Render Blueprint — static VitePress docs
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: e-comm-docs
+    runtime: static
+    buildCommand: corepack enable && pnpm install && pnpm docs:build
+    staticPublishPath: docs/.vitepress/dist
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
