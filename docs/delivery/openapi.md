@@ -16,6 +16,13 @@ npm run validate
 npm run docs:build
 ```
 
+## Complete OpenAPI contract
+
+The specification below is rendered directly from the canonical
+`docs/delivery/openapi.yaml` file. It is not a manually copied version.
+
+<<< ./openapi.yaml
+
 ## Related docs
 
 - [Contracts](./contracts.md) — lifecycle, idempotency, webhooks, ledger rules
