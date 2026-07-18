@@ -6,7 +6,16 @@ yarn.lock
 # VitePress build
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/public/delivery/openapi.yaml
 
 # Env / OS
 .DS_Store
 *.local
+.env
+.env.*
+
+# Editor / tooling
+.idea
+.vscode
+*.swp
+*.swo

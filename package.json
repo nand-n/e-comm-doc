@@ -3,10 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
+    "docs:dev": "npm run sync:openapi && vitepress dev docs",
+    "docs:build": "npm run sync:openapi && vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "build": "vitepress build docs"
+    "sync:openapi": "mkdir -p docs/public/delivery && cp docs/delivery/openapi.yaml docs/public/delivery/openapi.yaml",
+    "validate": "node scripts/validate-docs.mjs",
+    "prebuild": "npm run validate",
+    "build": "npm run docs:build",
+    "ci": "npm run validate && npm run docs:build"
   },
   "engines": {
     "node": "20.x"

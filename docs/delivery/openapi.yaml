@@ -1,0 +1,402 @@
+openapi: 3.0.3
+info:
+  title: Delivery-as-a-Service API
+  version: 1.0.0
+  description: Multi-tenant delivery platform public and operations API (Phase 1 foundation).
+servers:
+  - url: http://localhost:4000
+    description: Local API
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+paths:
+  /v1/auth/register:
+    post:
+      security: []
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+  /v1/auth/login:
+    post:
+      security: []
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: JWT issued
+  /v1/me:
+    get:
+      summary: Current user
+      responses:
+        '200':
+          description: User profile
+  /v1/businesses:
+    post:
+      summary: Create business tenant
+      responses:
+        '201':
+          description: Business created
+  /v1/businesses/{businessId}/branches:
+    post:
+      summary: Create branch
+      parameters:
+        - $ref: '#/components/parameters/businessId'
+      responses:
+        '201':
+          description: Branch created
+  /v1/businesses/{businessId}/api-keys:
+    post:
+      summary: Create API key (secret shown once)
+      parameters:
+        - $ref: '#/components/parameters/businessId'
+      responses:
+        '201':
+          description: API key created
+  /v1/businesses/{businessId}/webhooks:
+    post:
+      summary: Register webhook endpoint
+      parameters:
+        - $ref: '#/components/parameters/businessId'
+      responses:
+        '201':
+          description: Webhook registered
+  /v1/quotes:
+    post:
+      summary: Get delivery quote
+      responses:
+        '200':
+          description: Quote
+  /v1/deliveries:
+    post:
+      summary: Create delivery (idempotent)
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeliveryRequest'
+      responses:
+        '201':
+          description: Delivery created
+  /v1/deliveries/{deliveryId}:
+    get:
+      summary: Get delivery
+      parameters:
+        - $ref: '#/components/parameters/deliveryId'
+      responses:
+        '200':
+          description: Delivery
+  /v1/deliveries/{deliveryId}/cancel:
+    post:
+      summary: Cancel delivery
+      parameters:
+        - $ref: '#/components/parameters/deliveryId'
+      responses:
+        '200':
+          description: Cancelled
+  /v1/ops/deliveries/{deliveryId}/assign:
+    post:
+      summary: Manually assign rider
+      parameters:
+        - $ref: '#/components/parameters/deliveryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [riderId]
+              properties:
+                riderId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Assigned
+  /v1/riders/me/jobs:
+    get:
+      summary: Rider assigned jobs
+      responses:
+        '200':
+          description: Jobs
+  /v1/riders/me/availability:
+    post:
+      summary: Set online/offline
+      responses:
+        '200':
+          description: Updated
+  /v1/riders/jobs/{deliveryId}/status:
+    post:
+      summary: Advance delivery status
+      parameters:
+        - $ref: '#/components/parameters/deliveryId'
+      responses:
+        '200':
+          description: Updated
+  /v1/track/{token}:
+    get:
+      security: []
+      summary: Public tracking
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tracking payload
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    businessId:
+      name: businessId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    deliveryId:
+      name: deliveryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        name:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    AddressInput:
+      type: object
+      required: [line1, city, lat, lng]
+      properties:
+        line1:
+          type: string
+        line2:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+    PackageDimensionsInput:
+      type: object
+      additionalProperties: false
+      required: [length, width, height]
+      description: >
+        Bounding dimensions for one physical handling unit in integer millimetres.
+        The server normalizes orientation to descending sides; all three values are
+        supplied together and unknown dimensions are represented by omitting this object.
+      properties:
+        length:
+          type: integer
+          minimum: 1
+        width:
+          type: integer
+          minimum: 1
+        height:
+          type: integer
+          minimum: 1
+    PackageDeclaredValueInput:
+      type: object
+      additionalProperties: false
+      required: [amountMinor, currency]
+      properties:
+        amountMinor:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+    PackageHandlingInput:
+      type: object
+      additionalProperties: false
+      required: [fragile, liquid, perishable, keepUpright, stackability, sealRequired, tamperRequirement]
+      properties:
+        fragile:
+          type: boolean
+        liquid:
+          type: boolean
+        perishable:
+          type: boolean
+        keepUpright:
+          type: boolean
+        stackability:
+          type: string
+          enum: [stackable, not_stackable, unknown]
+        temperatureProfileCode:
+          type: string
+          description: Approved temperature-profile code; omission means no controlled-temperature claim.
+        tamperRequirement:
+          type: string
+          description: Active tamper-policy code.
+        sealRequired:
+          type: boolean
+        sealIdentifier:
+          type: string
+          description: Protected value; required only when configured seal policy requires it.
+        specialHandlingCodes:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        specialHandlingNote:
+          type: string
+    PackageGoodsDeclarationInput:
+      type: object
+      additionalProperties: false
+      required: [status, codes]
+      properties:
+        status:
+          type: string
+          enum: [not_declared, declared_clear, contains_restricted, contains_dangerous, unknown, review_required]
+        codes:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    PackageInput:
+      type: object
+      additionalProperties: false
+      required: [clientPackageKey, form, handling, goodsDeclaration]
+      description: >
+        One physical handling unit. Submit separate objects for separately handled
+        parcels; itemCount describes contents inside this unit and is not parcel quantity.
+        Allowed codes, required declarations, limits, and size thresholds are returned
+        by/configured through versioned platform policy.
+      properties:
+        clientPackageKey:
+          type: string
+          description: Stable caller key unique within this request/delivery.
+        merchantPackageReference:
+          type: string
+        description:
+          type: string
+          description: Minimized operational description; may be treated as sensitive.
+        contentsCategoryCode:
+          type: string
+          description: Code from the active versioned contents taxonomy.
+        itemCount:
+          type: integer
+          minimum: 1
+          description: Number of contents inside this handling unit.
+        form:
+          type: string
+          description: Active canonical form code, for example envelope, bag, box, tube, crate, pallet, or other.
+        containerCode:
+          type: string
+        declaredSizeClass:
+          type: string
+          description: >
+            Code from the active versioned size profile, for example small, medium,
+            large, or oversized. Thresholds are configurable; vague display terms
+            such as "big" are not implicitly accepted API codes.
+        weightGrams:
+          type: integer
+          minimum: 1
+          description: Declared weight in canonical integer grams; omission means unknown.
+        dimensionsMm:
+          $ref: '#/components/schemas/PackageDimensionsInput'
+        measurementStatus:
+          type: string
+          enum: [complete, weight_only, dimensions_only, unknown, unmeasurable]
+        declaredValue:
+          $ref: '#/components/schemas/PackageDeclaredValueInput'
+        handling:
+          $ref: '#/components/schemas/PackageHandlingInput'
+        goodsDeclaration:
+          $ref: '#/components/schemas/PackageGoodsDeclarationInput'
+        sensitiveContents:
+          type: boolean
+          default: false
+        customReferences:
+          type: object
+          additionalProperties:
+            type: string
+        metadata:
+          type: object
+          additionalProperties: true
+    CreateDeliveryRequest:
+      type: object
+      required: [businessId, externalOrderId, pickup, dropoff, packages]
+      properties:
+        businessId:
+          type: string
+          format: uuid
+        branchId:
+          type: string
+          format: uuid
+        externalOrderId:
+          type: string
+        mode:
+          type: string
+          enum: [on_demand, scheduled, bulk_item, multi_stop]
+          default: on_demand
+        pickup:
+          $ref: '#/components/schemas/AddressInput'
+        dropoff:
+          $ref: '#/components/schemas/AddressInput'
+        packages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PackageInput'
+        codAmount:
+          type: number
+        notes:
+          type: string

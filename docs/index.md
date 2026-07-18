@@ -3,12 +3,12 @@ layout: home
 
 hero:
   name: E-Comm Platform
-  text: System & implementation docs
-  tagline: Buyers, sellers, shared back end — built from the requirements, made implementable.
+  text: Commerce & delivery platform documentation
+  tagline: Marketplace architecture plus a fully integratable Delivery-as-a-Service product.
   actions:
     - theme: brand
-      text: Start with conventions
-      link: /implementation/conventions
+      text: Delivery platform docs
+      link: /delivery/
     - theme: alt
       text: Source requirements
       link: /requirment
@@ -17,6 +17,9 @@ hero:
       link: /guide
 
 features:
+  - title: Delivery-as-a-Service
+    details: Complete product, module, API, operations, finance, security, and integration documentation.
+    link: /delivery/
   - title: Requirements
     details: Original business supporting structure for buyer and seller fronts and six core services.
     link: /requirment

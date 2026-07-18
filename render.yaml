@@ -5,8 +5,10 @@ services:
   - type: web
     name: e-comm-docs
     runtime: static
-    buildCommand: rm -rf node_modules && npm ci && npm run docs:build
+    buildCommand: rm -rf node_modules && npm ci && npm run ci
     staticPublishPath: docs/.vitepress/dist
     envVars:
       - key: NODE_VERSION
         value: "20"
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"

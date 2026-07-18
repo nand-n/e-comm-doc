@@ -6,7 +6,7 @@ VitePress → static site on Render.
 
 | Field | Value |
 |-------|--------|
-| **Build command** | `rm -rf node_modules && npm ci && npm run docs:build` |
+| **Build command** | `rm -rf node_modules && npm ci && npm run ci` |
 | **Publish directory** | `docs/.vitepress/dist` |
 | **NODE_VERSION** | `20` |
 
@@ -24,7 +24,7 @@ Your log showed two problems:
 2. Build Command:
 
 ```bash
-rm -rf node_modules && npm ci && npm run docs:build
+rm -rf node_modules && npm ci && npm run ci
 ```
 
 3. Publish Directory: `docs/.vitepress/dist`
@@ -37,7 +37,7 @@ rm -rf node_modules && npm ci && npm run docs:build
 ```bash
 rm -rf node_modules
 npm ci
-npm run docs:build
+npm run ci
 ```
 
 ## Do not use on Render

@@ -1,9 +1,24 @@
 # Documentation index
 
-Every item in the [source requirements](/requirment) has an implementable guide.  
+This site covers two products:
+
+1. **[Delivery-as-a-Service](/delivery/)** — integratable delivery platform (Shopify, WooCommerce, Odoo, supermarket apps, custom e-commerce)
+2. **Marketplace e-commerce** — buyer/seller fronts and core services (below)
+
+Every marketplace item in the [source requirements](/requirment) has an implementable guide.  
 Overview: [System documentation](/system-documentation).
 
-## How to read these docs
+## Delivery platform (start here for DaaS)
+
+| Topic | Doc |
+|-------|-----|
+| Product & modules index | [Delivery docs](/delivery/) |
+| Technical stack | [React / React Native / NestJS / TypeORM / PostgreSQL / Redis](/delivery/technical-stack) |
+| Public API | [OpenAPI](/delivery/openapi) |
+| Platform integrations | [Integration handbook](/delivery/guides/platform-integration-handbook) |
+| Delivery modes | [Modes](/delivery/modes/) |
+
+## How to read the marketplace docs
 
 Start with [Conventions](/implementation/conventions), then [Auth, registration & KYC](/implementation/auth-registration-kyc). Prefer simple designs that still make the full purchase → deliver → payout path work.
 
