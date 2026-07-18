@@ -17,9 +17,6 @@ hero:
       link: /guide
 
 features:
-  - title: Delivery-as-a-Service
-    details: Complete product, module, API, operations, finance, security, and integration documentation.
-    link: /delivery/
   - title: Requirements
     details: Original business supporting structure for buyer and seller fronts and six core services.
     link: /requirment
@@ -32,4 +29,7 @@ features:
   - title: Implementation guides
     details: One how-to per feature and service — cart, catalog, payments, bots, admin, and more.
     link: /guide
+  - title: Delivery-as-a-Service
+    details: Complete product, module, API, operations, finance, security, and integration documentation.
+    link: /delivery/
 ---
